@@ -1,6 +1,7 @@
 'use strict';
 
 const form = document.querySelector('.form');
+const inputType = document.querySelector('.form__input--type');
 const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
@@ -57,4 +58,9 @@ form.addEventListener('submit', e => {
     )
     .setPopupContent('Workout')
     .openPopup();
+});
+
+inputType.addEventListener('change', () => {
+  inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+  inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
 });
