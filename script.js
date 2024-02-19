@@ -1,5 +1,11 @@
 'use strict';
 
+const form = document.querySelector('.form');
+const inputDistance = document.querySelector('.form__input--distance');
+const inputDuration = document.querySelector('.form__input--duration');
+const inputCadence = document.querySelector('.form__input--cadence');
+const inputElevation = document.querySelector('.form__input--elevation');
+
 if (navigator.geolocation)
   navigator.geolocation.getCurrentPosition(
     position => {
@@ -13,6 +19,8 @@ if (navigator.geolocation)
       }).addTo(map);
 
       map.on('click', mapEvent => {
+        form.classList.remove('hidden');
+        inputDistance.focus();
         const { lat, lng } = mapEvent.latlng;
         L.marker([lat, lng])
           .addTo(map)
