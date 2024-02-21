@@ -3,7 +3,7 @@
 class Workout {
   date = new Date();
   id = (Date.now() + '').slice(-10);
-  clicks = 0;
+  // clicks = 0;
 
   constructor(coords, distance, duration) {
     this.coords = coords; // [lat, lng]
@@ -18,9 +18,9 @@ class Workout {
     this.description = `${activity} on ${longMonth} ${day}`;
   }
 
-  click() {
-    this.clicks++;
-  }
+  // click() {
+  //   this.clicks++;
+  // }
 }
 
 class Running extends Workout {
@@ -260,9 +260,6 @@ class App {
       animate: true,
       pan: { duration: 1 },
     });
-
-    // Using the public interface
-    workout.click();
   }
 
   _setLocalStorage() {
