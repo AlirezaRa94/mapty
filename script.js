@@ -9,6 +9,13 @@ class Workout {
     this.distance = distance; // in km
     this.duration = duration; // in min
   }
+
+  _setDescription() {
+    const longMonth = this.date.toLocaleString('default', { month: 'long' });
+    const day = this.date.getDate();
+    const activity = `${this.type[0].toUpperCase()}${this.type.slice(1)}`;
+    this.description = `${activity} on ${longMonth} ${day}`;
+  }
 }
 
 class Running extends Workout {
@@ -17,6 +24,7 @@ class Running extends Workout {
     super(coords, distance, duration);
     this.cadence = cadence;
     this.calcPace();
+    this._setDescription();
   }
 
   calcPace() {
@@ -33,6 +41,7 @@ class Cycling extends Workout {
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
     this.calcSpeed();
+    this._setDescription();
   }
 
   calcSpeed() {
