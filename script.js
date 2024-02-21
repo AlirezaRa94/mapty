@@ -58,6 +58,7 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+const workoutsContainer = document.querySelector('.workouts');
 
 class App {
   #map;
@@ -95,6 +96,17 @@ class App {
     this.#mapEvent = mapE;
     form.classList.remove('hidden');
     inputDistance.focus();
+  }
+
+  _hideForm() {
+    inputDistance.value =
+      inputDuration.value =
+      inputCadence.value =
+      inputElevation.value =
+        '';
+    form.style.display = 'none';
+    form.classList.add('hidden');
+    setTimeout(() => (form.style.display = 'grid'), 1000);
   }
 
   _toggleElevationField() {
@@ -148,13 +160,10 @@ class App {
     this._renderWorkoutMarker(workout);
 
     // Render workout on list
+    this._renderWorkout(workout);
 
     // Hide form + clear input fields
-    inputDistance.value =
-      inputDuration.value =
-      inputCadence.value =
-      inputElevation.value =
-        '';
+    this._hideForm();
   }
 
   _renderWorkoutMarker(workout) {
@@ -169,8 +178,53 @@ class App {
           className: `${workout.type}-popup`,
         })
       )
-      .setPopupContent('Workout')
+      .setPopupContent(
+        `${workout.type === 'running' ? '🏃‍♂️' : '🚵‍♀️'} ${workout.description}`
+      )
       .openPopup();
+  }
+
+  _renderWorkout(workout) {
+    const html = `<li class="workout workout--${workout.type}" data-id=${
+      workout.id
+    }>
+    <h2 class="workout__title">${workout.description}</h2>
+    <div class="workout__details">
+      <span class="workout__icon">${
+        workout.type === 'running' ? '🏃‍♂️' : '🚵‍♀️'
+      }</span>
+      <span class="workout__value">${workout.distance}</span>
+      <span class="workout__unit">km</span>
+    </div>
+    <div class="workout__details">
+      <span class="workout__icon">⏰</span>
+      <span class="workout__value">${workout.duration}</span>
+      <span class="workout__unit">min</span>
+    </div>
+    <div class="workout__details">
+      <span class="workout__icon">⚡️</span>
+      <span class="workout__value">${
+        workout.type === 'running'
+          ? workout.pace.toFixed(1)
+          : workout.speed.toFixed(1)
+      }</span>
+      <span class="workout__unit">${
+        workout.type === 'running' ? 'min/km' : 'km/h'
+      }</span>
+    </div>
+    <div class="workout__details">
+      <span class="workout__icon">${
+        workout.type === 'running' ? '🦶' : '⛰️'
+      }</span>
+      <span class="workout__value">${
+        workout.type === 'running' ? workout.cadence : workout.elevationGain
+      }</span>
+      <span class="workout__unit">${
+        workout.type === 'running' ? 'spm' : 'm'
+      }</span>
+    </div>
+  </li>`;
+    workoutsContainer.insertAdjacentHTML('afterbegin', html);
   }
 }
 
