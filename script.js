@@ -1,14 +1,18 @@
 'use strict';
 
 class Workout {
-  date = new Date();
-  id = (Date.now() + '').slice(-10);
-  // clicks = 0;
-
-  constructor(coords, distance, duration) {
+  constructor(
+    coords,
+    distance,
+    duration,
+    date = new Date(),
+    id = (Date.now() + '').slice(-10)
+  ) {
     this.coords = coords; // [lat, lng]
     this.distance = distance; // in km
     this.duration = duration; // in min
+    this.date = typeof date === 'string' ? new Date(date) : date;
+    this.id = id;
   }
 
   _setDescription() {
@@ -18,6 +22,19 @@ class Workout {
     this.description = `${activity} on ${longMonth} ${day}`;
   }
 
+  _setCompactVersion() {
+    this.compact = {
+      type: this.type,
+      coords: this.coords,
+      distance: this.distance,
+      duration: this.duration,
+      date: this.date,
+      id: this.id,
+    };
+    if (this.type == 'running') this.compact['cadence'] = this.cadence;
+    if (this.type == 'cycling') this.compact['elevation'] = this.elevation;
+  }
+
   // click() {
   //   this.clicks++;
   // }
@@ -25,11 +42,12 @@ class Workout {
 
 class Running extends Workout {
   type = 'running';
-  constructor(coords, distance, duration, cadence) {
-    super(coords, distance, duration);
+  constructor({ coords, distance, duration, cadence, date, id }) {
+    super(coords, distance, duration, date, id);
     this.cadence = cadence;
     this.calcPace();
     this._setDescription();
+    this._setCompactVersion();
   }
 
   calcPace() {
@@ -42,11 +60,12 @@ class Running extends Workout {
 class Cycling extends Workout {
   type = 'cycling';
 
-  constructor(coords, distance, duration, elevationGain) {
-    super(coords, distance, duration);
-    this.elevationGain = elevationGain;
+  constructor({ coords, distance, duration, elevation, date, id }) {
+    super(coords, distance, duration, date, id);
+    this.elevation = elevation;
     this.calcSpeed();
     this._setDescription();
+    this._setCompactVersion();
   }
 
   calcSpeed() {
@@ -155,7 +174,12 @@ class App {
       )
         return alert('Inputs have to be positive numbers!');
 
-      workout = new Running([lat, lng], distance, duration, cadence);
+      workout = new Running({
+        coords: [lat, lng],
+        distance,
+        duration,
+        cadence,
+      });
     }
 
     // If workout is cycling, create a cycling object
@@ -166,7 +190,12 @@ class App {
         !allPositives(distance, duration)
       )
         return alert('Inputs have to be positive numbers!');
-      workout = new Cycling([lat, lng], distance, duration, elevation);
+      workout = new Cycling({
+        coords: [lat, lng],
+        distance,
+        duration,
+        elevation,
+      });
     }
 
     // Add new object to the workouts arry
@@ -236,7 +265,7 @@ class App {
         workout.type === 'running' ? '🦶' : '⛰️'
       }</span>
       <span class="workout__value">${
-        workout.type === 'running' ? workout.cadence : workout.elevationGain
+        workout.type === 'running' ? workout.cadence : workout.elevation
       }</span>
       <span class="workout__unit">${
         workout.type === 'running' ? 'spm' : 'm'
@@ -263,14 +292,19 @@ class App {
   }
 
   _setLocalStorage() {
-    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+    localStorage.setItem(
+      'workouts',
+      JSON.stringify(this.#workouts.map(workout => workout.compact))
+    );
   }
 
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
 
     if (!data) return;
-    this.#workouts = data;
+    this.#workouts = data.map(item =>
+      item.type === 'running' ? new Running(item) : new Cycling(item)
+    );
 
     // Rendering already exist workouts on the sidebar
     this.#workouts.forEach(workout => {
