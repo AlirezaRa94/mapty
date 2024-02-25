@@ -233,45 +233,48 @@ class App {
   }
 
   _renderWorkout(workout) {
-    const html = `<li class="workout workout--${workout.type}" data-id=${
-      workout.id
-    }>
-    <h2 class="workout__title">${workout.description}</h2>
-    <div class="workout__details">
-      <span class="workout__icon">${
-        workout.type === 'running' ? '🏃‍♂️' : '🚵‍♀️'
-      }</span>
-      <span class="workout__value">${workout.distance}</span>
-      <span class="workout__unit">km</span>
-    </div>
-    <div class="workout__details">
-      <span class="workout__icon">⏰</span>
-      <span class="workout__value">${workout.duration}</span>
-      <span class="workout__unit">min</span>
-    </div>
-    <div class="workout__details">
-      <span class="workout__icon">⚡️</span>
-      <span class="workout__value">${
-        workout.type === 'running'
-          ? workout.pace.toFixed(1)
-          : workout.speed.toFixed(1)
-      }</span>
-      <span class="workout__unit">${
-        workout.type === 'running' ? 'min/km' : 'km/h'
-      }</span>
-    </div>
-    <div class="workout__details">
-      <span class="workout__icon">${
-        workout.type === 'running' ? '🦶' : '⛰️'
-      }</span>
-      <span class="workout__value">${
-        workout.type === 'running' ? workout.cadence : workout.elevation
-      }</span>
-      <span class="workout__unit">${
-        workout.type === 'running' ? 'spm' : 'm'
-      }</span>
-    </div>
-  </li>`;
+    const html = `
+      <li class="workout workout--${workout.type}" data-id=${workout.id}>
+        <a class="delete-button" aria-label="Delete item" role="button">
+          <span>&times;</span>
+        </a>
+        <h2 class="workout__title">${workout.description}</h2>
+        <div class="workout__details">
+          <span class="workout__icon">${
+            workout.type === 'running' ? '🏃‍♂️' : '🚵‍♀️'
+          }</span>
+          <span class="workout__value">${workout.distance}</span>
+          <span class="workout__unit">km</span>
+        </div>
+        <div class="workout__details">
+          <span class="workout__icon">⏰</span>
+          <span class="workout__value">${workout.duration}</span>
+          <span class="workout__unit">min</span>
+        </div>
+        <div class="workout__details">
+          <span class="workout__icon">⚡️</span>
+          <span class="workout__value">${
+            workout.type === 'running'
+              ? workout.pace.toFixed(1)
+              : workout.speed.toFixed(1)
+          }</span>
+          <span class="workout__unit">${
+            workout.type === 'running' ? 'min/km' : 'km/h'
+          }</span>
+        </div>
+        <div class="workout__details">
+          <span class="workout__icon">${
+            workout.type === 'running' ? '🦶' : '⛰️'
+          }</span>
+          <span class="workout__value">${
+            workout.type === 'running' ? workout.cadence : workout.elevation
+          }</span>
+          <span class="workout__unit">${
+            workout.type === 'running' ? 'spm' : 'm'
+          }</span>
+        </div>
+      </li>
+    `;
 
     workoutsContainer.insertAdjacentHTML('afterbegin', html);
   }
