@@ -89,6 +89,7 @@ class App {
   #mapZoomLevel = 13;
   #mapEvent;
   #workouts = [];
+  #markers = [];
 
   constructor() {
     // Get user's position
@@ -100,7 +101,10 @@ class App {
     // Attach evenet handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
-    workoutsContainer.addEventListener('click', this._moveToPopup.bind(this));
+    workoutsContainer.addEventListener(
+      'click',
+      this._handleWorkoutClick.bind(this)
+    );
   }
 
   _getPosition() {
@@ -215,7 +219,8 @@ class App {
   }
 
   _renderWorkoutMarker(workout) {
-    L.marker(workout.coords)
+    const marker = L.marker(workout.coords, { id: workout.id });
+    marker
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -230,6 +235,8 @@ class App {
         `${workout.type === 'running' ? '🏃‍♂️' : '🚵‍♀️'} ${workout.description}`
       )
       .openPopup();
+
+    this.#markers.push(marker);
   }
 
   _renderWorkout(workout) {
@@ -279,11 +286,19 @@ class App {
     workoutsContainer.insertAdjacentHTML('afterbegin', html);
   }
 
-  _moveToPopup(e) {
+  _handleWorkoutClick(e) {
+    if (!this.#map) return;
+
+    const deleteButtonEl = e.target.closest('.delete-button');
     const workoutEl = e.target.closest('.workout');
 
     if (!workoutEl) return;
 
+    if (deleteButtonEl) this._deleteWorkout(workoutEl);
+    else this._moveToPopup(workoutEl);
+  }
+
+  _moveToPopup(workoutEl) {
     const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
@@ -292,6 +307,28 @@ class App {
       animate: true,
       pan: { duration: 1 },
     });
+  }
+
+  _deleteWorkout(workoutEl) {
+    const id = workoutEl.dataset.id;
+    const index = this.#workouts.findIndex(work => work.id === id);
+    const markerIndex = this.#markers.findIndex(
+      marker => marker.options.id === id
+    );
+
+    const confirmed = window.confirm(
+      `Delete your ${
+        this.#workouts[index].description
+      }? This action cannot be undone.`
+    );
+
+    if (confirmed) {
+      this.#workouts.splice(index, 1);
+      workoutsContainer.removeChild(workoutEl);
+      this.#map.removeLayer(this.#markers[markerIndex]);
+      this.#markers.splice(markerIndex, 1);
+      this._setLocalStorage();
+    }
   }
 
   _setLocalStorage() {
